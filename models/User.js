@@ -24,6 +24,21 @@ const userSchema = new mongoose.Schema(
       enum: ["student", "instructor"],
       default: "student",
     },
+    phone: {
+      type: String,
+      default: "",
+      trim: true,
+    },
+    gender: {
+      type: String,
+      default: "",
+      trim: true,
+    },
+    bio: {
+      type: String,
+      default: "",
+      trim: true,
+    },
   },
   {
     timestamps: true,
