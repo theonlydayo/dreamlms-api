@@ -76,8 +76,48 @@ const getCourseWithCurriculum = async (slug) => {
   };
 };
 
+const createCourse = async ({
+  title,
+  description,
+  image,
+  category,
+  price,
+  level,
+  instructor,
+}) => {
+  const course = await Course.create({
+    title,
+    slug: title
+      .toLowerCase()
+      .trim()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/(^-|-$)/g, ""),
+    description,
+    image,
+    category,
+    instructor,
+    price,
+    level,
+    status: "draft",
+  });
+
+  return course;
+};
+
+const getInstructorCourses = async (instructorId) => {
+  const courses = await Course.find({
+    instructor: instructorId,
+  })
+    .populate("category", "name slug")
+    .sort({ createdAt: -1 });
+
+  return courses;
+};
+
 export {
   getCourses,
   getCourseBySlug,
   getCourseWithCurriculum,
+  createCourse,
+  getInstructorCourses,
 };

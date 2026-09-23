@@ -1,9 +1,12 @@
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import User from "../models/User.js";
+import Instructor from "../models/Instructor.js";
 
-const registerUser = async (name, email, password) => {
-  const existingUser = await User.findOne({ email });
+const registerUser = async (name, email, password, role) => {
+  const Model = role === "instructor" ? Instructor : User;
+
+  const existingUser = await Model.findOne({ email });
 
   if (existingUser) {
     throw new Error("User with this email already exists");
@@ -11,7 +14,7 @@ const registerUser = async (name, email, password) => {
 
   const hashedPassword = await bcrypt.hash(password, 10);
 
-  const user = await User.create({
+  const user = await Model.create({
     name,
     email,
     password: hashedPassword,
@@ -21,13 +24,15 @@ const registerUser = async (name, email, password) => {
     id: user._id,
     name: user.name,
     email: user.email,
-    role: user.role,
+    role,
     createdAt: user.createdAt,
   };
 };
 
-const loginUser = async (email, password) => {
-  const user = await User.findOne({ email });
+const loginUser = async (email, password, role) => {
+  const Model = role === "instructor" ? Instructor : User;
+
+  const user = await Model.findOne({ email });
 
   if (!user) {
     throw new Error("Invalid email or password");
@@ -42,7 +47,7 @@ const loginUser = async (email, password) => {
   const token = jwt.sign(
     {
       id: user._id,
-      role: user.role,
+      role,
     },
     process.env.JWT_SECRET,
     {
@@ -56,7 +61,7 @@ const loginUser = async (email, password) => {
       id: user._id,
       name: user.name,
       email: user.email,
-      role: user.role,
+      role,
       createdAt: user.createdAt,
     },
   };

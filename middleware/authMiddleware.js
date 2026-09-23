@@ -1,5 +1,6 @@
 import jwt from "jsonwebtoken";
 import User from "../models/User.js";
+import Instructor from "../models/Instructor.js";
 
 const protect = async (req, res, next) => {
   try {
@@ -15,7 +16,10 @@ const protect = async (req, res, next) => {
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-    const user = await User.findById(decoded.id).select("-password");
+    const Model =
+      decoded.role === "instructor" ? Instructor : User;
+
+    const user = await Model.findById(decoded.id).select("-password");
 
     if (!user) {
       return res.status(401).json({
@@ -24,6 +28,7 @@ const protect = async (req, res, next) => {
     }
 
     req.user = user;
+    req.user.role = decoded.role;
 
     next();
   } catch (error) {
@@ -33,4 +38,14 @@ const protect = async (req, res, next) => {
   }
 };
 
-export default protect;
+const instructorOnly = (req, res, next) => {
+  if (req.user?.role !== "instructor") {
+    return res.status(403).json({
+      message: "Instructor access required",
+    });
+  }
+
+  next();
+};
+
+export { protect, instructorOnly };

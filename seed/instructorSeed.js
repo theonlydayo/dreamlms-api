@@ -2,7 +2,7 @@ import dns from "dns";
 import dotenv from "dotenv";
 import mongoose from "mongoose";
 import bcrypt from "bcryptjs";
-import User from "../models/User.js";
+import Instructor from "../models/Instructor.js";
 
 dns.setServers(["8.8.8.8", "8.8.4.4"]);
 
@@ -12,7 +12,7 @@ const seedInstructor = async () => {
   try {
     await mongoose.connect(process.env.MONGO_URI);
 
-    const existingInstructor = await User.findOne({
+    const existingInstructor = await Instructor.findOne({
       email: "instructor@dreamslms.com",
     });
 
@@ -24,11 +24,10 @@ const seedInstructor = async () => {
 
     const hashedPassword = await bcrypt.hash("Instructor123", 10);
 
-    await User.create({
+    await Instructor.create({
       name: "Dreams LMS Instructor",
       email: "instructor@dreamslms.com",
       password: hashedPassword,
-      role: "instructor",
     });
 
     console.log("Instructor created successfully");

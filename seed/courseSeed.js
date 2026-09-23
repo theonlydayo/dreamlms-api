@@ -3,7 +3,7 @@ import dotenv from "dotenv";
 import mongoose from "mongoose";
 import Course from "../models/Course.js";
 import Category from "../models/Category.js";
-import User from "../models/User.js";
+import Instructor from "../models/Instructor.js";
 
 dns.setServers(["8.8.8.8", "8.8.4.4"]);
 
@@ -13,8 +13,8 @@ const seedCourses = async () => {
   try {
     await mongoose.connect(process.env.MONGO_URI);
 
-    const instructor = await User.findOne({
-      role: "instructor",
+    const instructor = await Instructor.findOne({
+      email: "instructor@dreamslms.com",
     });
 
     if (!instructor) {
@@ -107,7 +107,6 @@ const seedCourses = async () => {
     ];
 
     await Course.deleteMany();
-
     await Course.insertMany(courses);
 
     console.log("Courses seeded successfully");
