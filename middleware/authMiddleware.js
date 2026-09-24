@@ -4,7 +4,6 @@ import Instructor from "../models/Instructor.js";
 
 const protect = async (req, res, next) => {
   try {
-    console.log("Cookies:", req.cookies);
     const token = req.cookies.accessToken;
 
     if (!token) {
@@ -14,13 +13,11 @@ const protect = async (req, res, next) => {
     }
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    console.log("Decoded:", decoded);
 
     const Model =
       decoded.role === "instructor" ? Instructor : User;
 
     const user = await Model.findById(decoded.id).select("-password");
-    console.log("User found:", user);
 
     if (!user) {
       return res.status(401).json({
