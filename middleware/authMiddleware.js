@@ -20,6 +20,7 @@ const protect = async (req, res, next) => {
       decoded.role === "instructor" ? Instructor : User;
 
     const user = await Model.findById(decoded.id).select("-password");
+    console.log("User found:", user);
 
     if (!user) {
       return res.status(401).json({
