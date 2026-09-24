@@ -54,9 +54,16 @@ const login = async (req, res) => {
 
     const result = await loginUser(email, password, role);
 
+    res.cookie("accessToken", result.token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+    });
+
     res.status(200).json({
       message: "Login successful",
-      ...result,
+      user: result.user,
     });
   } catch (error) {
     res.status(401).json({
@@ -104,4 +111,16 @@ const updateProfile = async (req, res) => {
   }
 };
 
-export { register, login, updateProfile };
+const logout = (req, res) => {
+  res.clearCookie("accessToken", {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+  });
+
+  res.status(200).json({
+    message: "Logout successful",
+  });
+};
+
+export { register, login, logout, updateProfile };

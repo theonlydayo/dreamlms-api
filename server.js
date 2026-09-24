@@ -6,6 +6,7 @@ import connectDB from "./config/db.js";
 import authRoutes from "./routes/authRoutes.js";
 import courseRoutes from "./routes/courseRoutes.js";
 import uploadRoutes from "./routes/uploadRoutes.js";
+import cookieParser from "cookie-parser";
 
 dns.setServers(["8.8.8.8", "8.8.4.4"]);
 
@@ -15,8 +16,17 @@ const app = express();
 
 const PORT = process.env.PORT || 5000;
 
-app.use(cors());
+app.use(
+  cors({
+    origin: [
+      "http://localhost:5173",
+      "https://dreamlms-ui.vercel.app",
+    ],
+    credentials: true,
+  })
+);
 app.use(express.json());
+app.use(cookieParser());
 
 app.use((req, res, next) => {
   console.log(req.method, req.url);

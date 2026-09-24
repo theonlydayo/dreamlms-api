@@ -4,15 +4,13 @@ import Instructor from "../models/Instructor.js";
 
 const protect = async (req, res, next) => {
   try {
-    const authorization = req.headers.authorization;
+    const token = req.cookies.accessToken;
 
-    if (!authorization || !authorization.startsWith("Bearer ")) {
+    if (!token) {
       return res.status(401).json({
         message: "Not authorized. No token provided",
       });
     }
-
-    const token = authorization.split(" ")[1];
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
