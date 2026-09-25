@@ -19,7 +19,10 @@ router.post("/logout", logout);
 
 router.get("/me", protect, (req, res) => {
   res.status(200).json({
-    user: req.user,
+    user: {
+      ...req.user,
+      role: req.user.role,
+    },
   });
 });
 

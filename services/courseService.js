@@ -25,11 +25,18 @@ const getCourseBySlug = async (slug) => {
   return course;
 };
 
-const getCourseWithCurriculum = async (slug) => {
-  const course = await Course.findOne({
-    slug,
-    status: "published",
-  });
+const getCourseWithCurriculum = async (slug, instructorId = null) => {
+  const query = { slug };
+
+  if (instructorId) {
+    query.instructor = instructorId;
+  } else {
+    query.status = "published";
+  }
+
+  const course = await Course.findOne(query)
+    .populate("category", "name slug")
+    .populate("instructor", "name email");
 
   if (!course) {
     throw new Error("Course not found");
@@ -71,6 +78,7 @@ const getCourseWithCurriculum = async (slug) => {
       image: course.image,
       price: course.price,
       level: course.level,
+      status: course.status,
     },
     curriculum: result,
   };
@@ -114,10 +122,62 @@ const getInstructorCourses = async (instructorId) => {
   return courses;
 };
 
+const getInstructorCourseBySlug = async (slug, instructorId) => {
+  const course = await Course.findOne({
+    slug,
+    instructor: instructorId,
+  })
+    .populate("category", "name slug")
+    .populate("instructor", "name email");
+
+  if (!course) {
+    throw new Error("Course not found");
+  }
+
+  return course;
+};
+
+const updateInstructorCourse = async (
+  slug,
+  instructorId,
+  {
+    title,
+    description,
+    image,
+    category,
+    price,
+    level,
+    status,
+  }
+) => {
+  const course = await Course.findOne({
+    slug,
+    instructor: instructorId,
+  });
+
+  if (!course) {
+    throw new Error("Course not found");
+  }
+
+  course.title = title;
+  course.description = description;
+  course.image = image;
+  course.category = category;
+  course.price = price;
+  course.level = level;
+  course.status = status;
+
+  await course.save();
+
+  return course;
+};
+
 export {
   getCourses,
   getCourseBySlug,
   getCourseWithCurriculum,
   createCourse,
   getInstructorCourses,
+  getInstructorCourseBySlug,
+  updateInstructorCourse,
 };

@@ -25,7 +25,7 @@ const protect = async (req, res, next) => {
       });
     }
 
-    req.user = user;
+    req.user = user.toObject();
     req.user.role = decoded.role;
 
     next();

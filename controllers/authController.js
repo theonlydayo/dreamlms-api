@@ -27,7 +27,10 @@ const register = async (req, res) => {
 
     res.status(201).json({
       message: "User registered successfully",
-      user,
+      user: {
+        ...user.toObject(),
+        role,
+      },
     });
   } catch (error) {
     res.status(400).json({
@@ -57,13 +60,17 @@ const login = async (req, res) => {
     res.cookie("accessToken", result.token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
-      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+      sameSite:
+        process.env.NODE_ENV === "production" ? "none" : "lax",
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
     res.status(200).json({
       message: "Login successful",
-      user: result.user,
+      user: {
+        ...result.user,
+        role,
+      },
     });
   } catch (error) {
     res.status(401).json({
@@ -115,7 +122,8 @@ const logout = (req, res) => {
   res.clearCookie("accessToken", {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
-    sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+    sameSite:
+      process.env.NODE_ENV === "production" ? "none" : "lax",
   });
 
   res.status(200).json({
